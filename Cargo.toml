@@ -1,0 +1,13 @@
+[package]
+name = "pong"
+version = "0.1.0"
+authors = ["JoshBrudnak <jobrud314@gmail.com>"]
+
+[dependencies]
+clap = "2.32"
+http = "0.1.5"
+tokio-core = "0.1.17"
+hyper = "0.12.11"
+futures = "0.1.25"
+
+
