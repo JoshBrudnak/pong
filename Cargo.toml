@@ -9,5 +9,9 @@ http = "0.1.5"
 tokio-core = "0.1.17"
 hyper = "0.12.11"
 futures = "0.1.25"
+termion = "1.5.1"
 
-
+[dependencies.tui]
+version = "0.3.0-beta.3"
+default-features = false
+features = ['termion']
