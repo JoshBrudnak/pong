@@ -19,10 +19,7 @@ use tui::backend::TermionBackend;
 use tui::layout::{Constraint, Direction, Layout, Rect};
 use tui::style::{Color, Modifier, Style};
 use tui::widgets::canvas::{Canvas, Line, Map, MapResolution};
-use tui::widgets::{
-    BarChart, Block, Borders, Dataset, Gauge, List, Marker, Paragraph, Row, SelectableList,
-    Sparkline, Table, Tabs, Text, Widget,
-};
+use tui::widgets::{Axis, Block, Borders, Chart, Dataset, List, Marker, Text, Widget};
 use tui::Terminal;
 
 fn send(req: String) {
@@ -60,16 +57,12 @@ fn ping(url: String) -> Result<(), io::Error> {
         times.push((ms.clone().to_string(), String::from("SUCCESS")));
 
         terminal.draw(|mut f| {
+            let constraints = vec![Constraint::Percentage(50), Constraint::Percentage(50)];
+
             let chunks = Layout::default()
-                .constraints([Constraint::Length(3), Constraint::Min(0)].as_ref())
-                .split(size);
-            Tabs::default()
-                .block(Block::default().borders(Borders::ALL).title("Tabs"))
-                .titles(&vec!["title1", "title2"])
-                .style(Style::default().fg(Color::Green))
-                .highlight_style(Style::default().fg(Color::Yellow))
-                .select(0)
-                .render(&mut f, chunks[0]);
+                .constraints(constraints)
+                .direction(Direction::Horizontal)
+                .split(Rect::default());
 
             let events = times.iter().map(|(evt, level)| {
                 Text::styled(
@@ -84,37 +77,39 @@ fn ping(url: String) -> Result<(), io::Error> {
 
             List::new(events)
                 .block(Block::default().borders(Borders::ALL).title("List"))
-                .render(&mut f, chunks[1]);
-            /*
+                .render(&mut f, chunks[0]);
 
-            BarChart::default()
-                .block(Block::default().borders(Borders::ALL).title("Bar chart"))
-                .data(&vec![
-                    ("B1", 9),
-                    ("B2", 12),
-                    ("B3", 5),
-                    ("B4", 8),
-                    ("B5", 2),
-                    ("B6", 4),
-                    ("B7", 5),
-                    ("B8", 9),
-                    ("B9", 14),
-                    ("B10", 15),
-                    ("B11", 1),
-                ]).bar_width(3)
-                .bar_gap(2)
-                .value_style(
-                    Style::default()
-                        .fg(Color::Black)
-                        .bg(Color::Green)
-                        .modifier(Modifier::Italic),
-                ).label_style(Style::default().fg(Color::Yellow))
-                .style(Style::default().fg(Color::Green))
-                .render(&mut f, chunks[2]);
-                */
+            Chart::default()
+                .block(Block::default().title("Time chart"))
+                .x_axis(
+                    Axis::default()
+                        .title("Time")
+                        .title_style(Style::default().fg(Color::Red))
+                        .style(Style::default().fg(Color::Gray))
+                        .bounds([0.0, 10.0])
+                        .labels(&["0.0", "5.0", "10.0"]),
+                ).y_axis(
+                    Axis::default()
+                        .title("Ping time")
+                        .title_style(Style::default().fg(Color::Red))
+                        .style(Style::default().fg(Color::Gray))
+                        .bounds([0.0, 10.0])
+                        .labels(&["0.0", "5.0", "10.0"]),
+                ).datasets(&[
+                    Dataset::default()
+                        .name("data1")
+                        .marker(Marker::Dot)
+                        .style(Style::default().fg(Color::Cyan))
+                        .data(&[(0.0, 5.0), (1.0, 6.0), (1.5, 6.434)]),
+                    Dataset::default()
+                        .name("data2")
+                        .marker(Marker::Braille)
+                        .style(Style::default().fg(Color::Magenta))
+                        .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
+                ]).render(&mut f, chunks[1]);
         })?;
 
-        sleep(Duration::new(2, 0));
+        sleep(Duration::new(1, 0));
     }
 }
 
